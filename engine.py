@@ -7,8 +7,6 @@ from bs4 import BeautifulSoup
 import nltk
 from nltk.tokenize import word_tokenize
 
-import difflib
-
 from models import Index, Document
 
 
