@@ -2,10 +2,14 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from flask import (Flask, jsonify, request)
+from flask import (Flask, jsonify, request, abort)
 from flask_moment import Moment
 
 from models import *
+
+from engine import Engine
+
+from request_errors import requires_body, requires_args
 
 
 #----------------------------------------------------------------------------#
@@ -29,12 +33,6 @@ def index():
     return jsonify({
         'search_engine': True
     }), 200
- 
-
-@app.route('/documents', methods=['POST'])
-def create_document():
-    pass
-
     
 @app.route('/init')
 def init():
@@ -45,6 +43,45 @@ def init():
     
     return jsonify({
         'success': True
+    }), 200
+    
+
+@app.route('/documents', methods=['POST'])
+@requires_body('body')
+def create_document():
+    body = request.get_json().get('body')
+    
+    engine = Engine()
+    engine.add_document(body)
+    
+    return jsonify({
+        'success': True
+    }), 200
+
+@app.route('/documents/<int:document_id>', methods=['get'])
+def get_document(document_id):
+    document = Document.query.get(document_id)
+    
+    if not document:
+        abort(400, 'Document not found')
+    
+    return jsonify({
+        'success': True,
+        'document': document.format()
+    }), 200
+
+
+@app.route('/search', methods=['get'])
+@requires_args('query')
+def search_documents():
+    query = request.args.get('query')
+    
+    engine = Engine()
+    results = engine.search(query)
+    
+    return jsonify({
+        'success': True,
+        'results': [Document.query.get(result).format() for result in results]
     }), 200
     
 
