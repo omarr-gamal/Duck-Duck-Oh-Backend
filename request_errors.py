@@ -1,17 +1,6 @@
-import re
 
-from flask import request, jsonify, abort
+from flask import request, jsonify
 from functools import wraps
-
-
-def validate_date(date):
-    if date is not None and not check_date_format(date):
-        abort(400, 'Invalid date format. Format must match yyyy-mm-dd')
-
-# matches 2020-01-23
-def check_date_format(input):
-    pattern = re.compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")
-    return bool(pattern.match(input))
 
 
 def requires_body(fields=''):
