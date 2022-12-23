@@ -47,6 +47,7 @@ class Document(BaseDbModel, db.Model):
         return {
             'id': self.id,
             'body': self.body,
+            'added_at': self.added_at.strftime('%Y-%m-%d %H:%M:%S')
         }        
         
 class Index(BaseDbModel, db.Model):
@@ -57,4 +58,4 @@ class Index(BaseDbModel, db.Model):
     index = db.Column(db.String)
     
     def __init__(self, index):
-        self.tmdb_id = index
+        self.index = index
