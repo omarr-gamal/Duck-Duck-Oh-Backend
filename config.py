@@ -13,6 +13,7 @@ SQLALCHEMY_DATABASE_URI = ''
 
 if os.environ['env'] == 'prod':
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace('postgres', 'postgresql')
 else:
     db_user = os.environ['DB_USER']
     db_pass = os.environ['DB_PASS']
