@@ -6,10 +6,11 @@ from flask import (Flask, jsonify, request, abort)
 from flask_moment import Moment
 
 from models import *
-
 from engine import Engine
 
 from request_errors import requires_body, requires_args
+
+from spellchecker import SpellChecker
 
 
 #----------------------------------------------------------------------------#
@@ -84,7 +85,6 @@ def get_document(document_id):
         'document': document.format()
     }), 200
 
-
 @app.route('/search', methods=['get'])
 @requires_args('query')
 def search_documents():
@@ -95,6 +95,18 @@ def search_documents():
     return jsonify({
         'success': True,
         'results': [Document.query.get(result).format() for result in results]
+    }), 200
+    
+@app.route('/search/images', methods=['get'])
+@requires_args('query')
+def search_images():
+    query = request.args.get('query')
+    
+    results = engine.search_images(query)
+    
+    return jsonify({
+        'success': True,
+        'results': results
     }), 200
     
 

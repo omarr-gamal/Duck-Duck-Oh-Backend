@@ -1,5 +1,3 @@
-import re
-
 import json
 
 from bs4 import BeautifulSoup
@@ -125,21 +123,22 @@ class Engine:
         ranked_documents = self.__rank_results(documents, search_term)
         
         return ranked_documents
-    
+
     def search_images(self, search_term):
-        # search for documents
-        documents = self.search(search_term)
-        
-        # get image URLs from documents
+        # Get matching documents
+        matching_documents = self.__search_index(search_term)
+
+        # Get image URLs from matching documents
         image_urls = []
-        for document_id in documents:
-            document_body = Document.query.get(document_id).body
+        for document_id in matching_documents:
+            document = Document.query.get(document_id)
             
             # parse HTML and extract image URLs
-            soup = BeautifulSoup(document_body, 'html.parser')
-            images = soup.find_all('img')
-            for image in images:
-                image_urls.append(image['src'])
-        
-        return image_urls
+            soup = BeautifulSoup(document.body, 'html.parser')
+            for img in soup.find_all('img'):
+                image_urls.append({
+                    'url': img['src'],
+                    'document_id': document.id
+                })
 
+        return image_urls
