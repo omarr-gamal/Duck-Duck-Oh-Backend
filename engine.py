@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 import nltk
 from nltk.tokenize import word_tokenize
+nltk.download('punkt')
 
 from models import Index, Document
 
@@ -35,8 +36,6 @@ class Engine:
         self.__index_document(document)
 
     def __index_document(self, document):
-        nltk.download('punkt')
-        
         index = self.__get_index()
         
         text, image_tags = self.__extract_text_and_tags(document.body)
