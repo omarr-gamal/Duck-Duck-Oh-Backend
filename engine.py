@@ -5,14 +5,12 @@ import json
 from bs4 import BeautifulSoup
 
 import nltk
-from nltk.tokenize import word_tokenize
 nltk.download('punkt')
 nltk.download('stopwords')
 
 from models import Index, Document
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -20,7 +18,6 @@ class Engine:
     def __init__(self):
         self.stop_words = set(nltk.corpus.stopwords.words('english'))
         self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)
-        self.lsi = TruncatedSVD(n_components=2)
         
         self.index = {}
         self.documents = [document.body for document in Document.query.all()]
@@ -34,8 +31,7 @@ class Engine:
     
         self.index = json.loads(ind.index)
             
-        self.vectorizer.fit(self.documents.reshape(1, -1))
-        self.lsi.fit(self.vectorizer.transform(self.documents.reshape(1, -1)))
+        self.vectorizer.fit(self.documents)
         
     def index_all_documents(self):
         for document in Document.query.all():
@@ -84,9 +80,7 @@ class Engine:
         tokens = self.__tokenize(body)
         self.__add_to_index(document.id, tokens)
     
-        # update LSI model
         self.vectorizer.fit(self.documents)
-        self.lsi.fit(self.vectorizer.transform(self.documents))
            
     def __search_index(self, search_term):
         search_tokens = self.__tokenize(search_term)
@@ -110,16 +104,9 @@ class Engine:
         # Get document bodies
         bodies = [Document.query.get(document_id).body for document_id in documents]
 
-        # Get LSI vectors for search term and documents
-        search_vector = self.lsi.transform(self.vectorizer.transform([search_term]))
-        document_vectors = self.lsi.transform(self.vectorizer.transform(bodies))
-
-        # Make sure search_vector and document_vectors are 2D arrays
-        if len(search_vector.shape) < 2:
-            search_vector = search_vector.reshape(1, -1)
-
-        if len(document_vectors.shape) < 2:
-            document_vectors = document_vectors.reshape(document_vectors.shape[0], 1)
+        # Get vectors for search term and documents
+        search_vector = self.vectorizer.transform([search_term])
+        document_vectors = self.vectorizer.transform(bodies)
 
         # Calculate cosine similarity between search vector and document vectors
         similarities = [cosine_similarity(search_vector, document_vector)[0][0] for document_vector in document_vectors]
