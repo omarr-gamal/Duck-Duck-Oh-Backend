@@ -41,6 +41,10 @@ def init():
 
     db.create_all(app=app)
     
+    Document(body='This is a document about cats.').insert()
+    Document(body='This is a document about dogs.').insert()
+    Document(body='This is a document about cats and dogs.').insert()
+    
     return jsonify({
         'success': True
     }), 200
