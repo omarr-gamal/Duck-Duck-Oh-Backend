@@ -23,6 +23,8 @@ app.config.from_pyfile('config.py')
 
 db.init_app(app)
 
+with app.app_context():
+    engine = Engine()
 
 #----------------------------------------------------------------------------#
 # Routes.
@@ -41,9 +43,18 @@ def init():
 
     db.create_all(app=app)
     
-    Document(body='This is a document about cats.').insert()
-    Document(body='This is a document about dogs.').insert()
-    Document(body='This is a document about cats and dogs.').insert()
+    Document('This is a document about cats.').insert()
+    Document('This is a document about dogs.').insert()
+    Document('This is a document about mcats and dogs.').insert()
+    Document('This is a document about catm and dogs.').insert()
+    Document('This is a document about mcat and dogs.').insert()
+    Document('This is a document about cats cats cats cat.').insert()
+    Document('This is a document about cat cat cat cat.').insert()
+    Document('This is a document about dog.').insert()
+    Document('This is a document about catsdogs.').insert()
+    Document('This is a document about elephants.').insert()
+    
+    engine.index_all_documents()
     
     return jsonify({
         'success': True
@@ -55,7 +66,6 @@ def init():
 def create_document():
     body = request.get_json().get('body')
     
-    engine = Engine()
     engine.add_document(body)
     
     return jsonify({
@@ -80,7 +90,6 @@ def get_document(document_id):
 def search_documents():
     query = request.args.get('query')
     
-    engine = Engine()
     results = engine.search(query)
     
     return jsonify({

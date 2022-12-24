@@ -7,107 +7,152 @@ from bs4 import BeautifulSoup
 import nltk
 from nltk.tokenize import word_tokenize
 nltk.download('punkt')
+nltk.download('stopwords')
 
 from models import Index, Document
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 class Engine:
-    def __get_index(self):
-        index = Index.query.first()
-        if not index:
-            index = Index('{}')
-            index.insert()
+    def __init__(self):
+        self.stop_words = set(nltk.corpus.stopwords.words('english'))
+        self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)
+        self.lsi = TruncatedSVD(n_components=2)
         
-        index_dict = json.loads(index.index)
-        return index_dict
+        self.index = {}
+        self.documents = [document.body for document in Document.query.all()]
+        
+        ind = Index.query.first()
+        if not ind:
+            ind = Index('{}')
+            ind.insert()
+            
+            self.index_all_documents()
     
-    def __update_index(self, index_dict):
-        index_json = json.dumps(index_dict)
+        self.index = json.loads(ind.index)
+            
+        self.vectorizer.fit(self.documents.reshape(1, -1))
+        self.lsi.fit(self.vectorizer.transform(self.documents.reshape(1, -1)))
+        
+    def index_all_documents(self):
+        for document in Document.query.all():
+            tokens = self.__tokenize(document.body)
+            self.__add_to_index(document.id, tokens)
+    
+    def __update_index(self):
+        index_json = json.dumps(self.index)
         
         index = Index.query.first()
         index.index = index_json
         
         index.update()
-
-    def add_document(self, body):
-        document = Document(body=body)
-        document.insert()
-        
-        self.__index_document(document)
-
-    def __index_document(self, document):
-        index = self.__get_index()
-        
-        text, image_tags = self.__extract_text_and_tags(document.body)
-        text_tokens, image_tokens = self.__tokenize(text, image_tags)
-        
-        tokens = text_tokens + image_tokens
-        
-        for token in tokens:
-            if token not in index:
-                index[token] = []
-            index[token].append(document.id)
-        
-        self.__update_index(index)
-
-    # Extract text and image tags from an HTML document
-    def __extract_text_and_tags(self, html_doc):
-        soup = BeautifulSoup(html_doc, 'html.parser')
-        text = soup.get_text()
-        image_tags = soup.find_all('img')
-        return text, image_tags
-
-    # Tokenize the text and image tags
-    def __tokenize(self, text, image_tags):
-        text_tokens = word_tokenize(text)
-        image_tokens = []
-        for tag in image_tags:
-            src = tag.get('src')
-            alt = tag.get('alt')
-            if src:
-                image_tokens.extend(re.findall(r'\b\w+\b', src))
-            if alt:
-                image_tokens.extend(re.findall(r'\b\w+\b', alt))
-        return text_tokens, image_tokens
     
-    def search(self, search_term):
-        # Tokenize the search term
-        search_tokens = word_tokenize(search_term)
-        # Initialize a set to keep track of the documents that contain all the tokens in the search term
-        matching_documents = set()
-        # Iterate over the tokens in the search term
-        for token in search_tokens:
-            # Get the documents that contain the current token
-            documents = self.__get_index().get(token, [])
-            # If this is the first token, initialize the matching_documents set with the documents that contain the token
-            if not matching_documents:
-                matching_documents = set(documents)
-            # Otherwise, update the matching_documents set to only include documents that contain all the tokens in the search term
+    def __tokenize(self, body):
+        # split body into tokens
+        tokens = nltk.word_tokenize(body)
+        
+        # remove stop words
+        tokens = [token for token in tokens if token not in self.stop_words]
+        
+        # stem tokens
+        stemmer = nltk.stem.PorterStemmer()
+        tokens = [stemmer.stem(token) for token in tokens]
+        
+        return tokens
+    
+    def __add_to_index(self, document_id, tokens):
+        # add document to index
+        for token in tokens:
+            if token in self.index:
+                self.index[token].append(document_id)
             else:
-                matching_documents &= set(documents)
-        # Rank the documents based on how closely they match the search term
-        ranked_documents = sorted(matching_documents, key=lambda doc_id: self.__rank_document(doc_id, search_term))
-        # Return the ranked document ids
+                self.index[token] = [document_id]
+                
+        self.__update_index()
+    
+    def add_document(self, body):
+        document = Document(body)
+        document.insert()
+    
+        # add document to list of documents
+        self.documents.append(body)
+    
+        # tokenize and add to index
+        tokens = self.__tokenize(body)
+        self.__add_to_index(document.id, tokens)
+    
+        # update LSI model
+        self.vectorizer.fit(self.documents)
+        self.lsi.fit(self.vectorizer.transform(self.documents))
+           
+    def __search_index(self, search_term):
+        search_tokens = self.__tokenize(search_term)
+        
+        # get documents that match search tokens
+        matching_documents = []
+        for token in search_tokens:
+            if token in self.index:
+                matching_documents += self.index[token]
+        
+        # remove duplicates
+        matching_documents = list(set(matching_documents))
+        
+        return matching_documents
+    
+    def __rank_results(self, documents, search_term):
+        # Check if documents list is empty or search_term is empty
+        if not len(documents) or not search_term:
+            return []
+
+        # Get document bodies
+        bodies = [Document.query.get(document_id).body for document_id in documents]
+
+        # Get LSI vectors for search term and documents
+        search_vector = self.lsi.transform(self.vectorizer.transform([search_term]))
+        document_vectors = self.lsi.transform(self.vectorizer.transform(bodies))
+
+        # Make sure search_vector and document_vectors are 2D arrays
+        if len(search_vector.shape) < 2:
+            search_vector = search_vector.reshape(1, -1)
+
+        if len(document_vectors.shape) < 2:
+            document_vectors = document_vectors.reshape(document_vectors.shape[0], 1)
+
+        # Calculate cosine similarity between search vector and document vectors
+        similarities = [cosine_similarity(search_vector, document_vector)[0][0] for document_vector in document_vectors]
+
+        # Rank documents by similarity
+        ranked_documents = [document for _, document in sorted(zip(similarities, documents), reverse=True)]
+
         return ranked_documents
     
-    def __rank_document(self, doc_id, search_term):
-        # Fetch the document with the given id
-        document = Document.query.get(doc_id)
-        # Tokenize the document
-        nltk.download('punkt')
-        text, image_tags = self.__extract_text_and_tags(document.body)
-        text_tokens, image_tokens = self.__tokenize(text, image_tags)
-        tokens = text_tokens + image_tokens
-        # Tokenize the search term
-        search_tokens = word_tokenize(search_term)
-        # Initialize a count to keep track of the number of occurrences of the search term in the document
-        count = 0
-        # Iterate over the tokens in the document
-        for i, token in enumerate(tokens):
-            # Check if the current token is the first token in the search term
-            if token == search_tokens[0]:
-                # Check if the remaining tokens in the document match the search term
-                if tokens[i:i+len(search_tokens)] == search_tokens:
-                    count += 1
-        # Return the count as the rank
-        return count
+    # return a list of document ids that are ranked based on relevance to search_term
+    def search(self, search_term):
+        # search index
+        documents = self.__search_index(search_term)
+        
+        # rank documents by relevance
+        ranked_documents = self.__rank_results(documents, search_term)
+        
+        return ranked_documents
+    
+    def search_images(self, search_term):
+        # search for documents
+        documents = self.search(search_term)
+        
+        # get image URLs from documents
+        image_urls = []
+        for document_id in documents:
+            document_body = Document.query.get(document_id).body
+            
+            # parse HTML and extract image URLs
+            soup = BeautifulSoup(document_body, 'html.parser')
+            images = soup.find_all('img')
+            for image in images:
+                image_urls.append(image['src'])
+        
+        return image_urls
+
