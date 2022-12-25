@@ -11,6 +11,7 @@ from engine import Engine
 from request_errors import requires_body, requires_args
 
 from spellchecker import SpellChecker
+from bs4 import BeautifulSoup
 
 
 #----------------------------------------------------------------------------#
@@ -45,17 +46,6 @@ def init():
     db.create_all(app=app)
     
     import init_db
-    
-    # Document('This is a document about cats.').insert()
-    # Document('This is a document about dogs.').insert()
-    # Document('This is a document about mcats and dogs.').insert()
-    # Document('This is a document about catm and dogs.').insert()
-    # Document('This is a document about mcat and dogs.').insert()
-    # Document('This is a document about cats cats cats cat.').insert()
-    # Document('This is a document about cat cat cat cat.').insert()
-    # Document('This is a document about dog.').insert()
-    # Document('This is a document about catsdogs.').insert()
-    # Document('This is a document about elephants.').insert()
     
     global engine
     engine = Engine()
@@ -99,6 +89,34 @@ def search_documents():
         query = ' '.join([spell_checker.correction(word) for word in query.split(' ')])
 
     results = engine.search(query)
+    
+    # Extract title and outline from each document
+    soup = BeautifulSoup(document.body, 'html.parser')
+    
+    formatted_results = []
+    for result in results:
+        document = Document.query.get(result)
+
+        # Extract title
+        title = soup.title.text if soup.title else ''
+
+        # Extract outline
+        outline = ''
+        p_tags = soup.find_all('p')
+        if p_tags:
+            outline = p_tags[0].text
+        else:
+            div_tags = soup.find_all('div')
+            if div_tags:
+                outline = div_tags[0].text
+
+        formatted_results.append({
+            'id': document.id,
+            'title': title,
+            'body': document.body,
+            'added_at': document.added_at,
+            'outline': outline
+        })
     
     return jsonify({
         'success': True,
