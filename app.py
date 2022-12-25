@@ -28,8 +28,8 @@ db.init_app(app)
 
 CORS(app, resources={r"*/api/*": {"origins": "*"}})
 
-with app.app_context():
-    engine = Engine()
+# with app.app_context():
+#     engine = Engine()
 
 #----------------------------------------------------------------------------#
 # Routes.
@@ -60,8 +60,8 @@ def init():
     
     import init_db
     
-    global engine
-    engine = Engine()
+#     global engine
+#     engine = Engine()
     
     return jsonify({
         'success': True
