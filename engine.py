@@ -138,10 +138,13 @@ class Engine:
     def search_images(self, search_term):
         # Get matching documents
         matching_documents = self.__search_index(search_term)
+        
+        # rank documents by relevance
+        ranked_documents = self.__rank_results(matching_documents, search_term)
 
         # Get image URLs from matching documents
         image_urls = []
-        for document_id in matching_documents:
+        for document_id in ranked_documents:
             document = Document.query.get(document_id)
             
             # parse HTML and extract image URLs

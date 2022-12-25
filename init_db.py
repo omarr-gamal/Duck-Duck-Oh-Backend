@@ -7,7 +7,7 @@ Document("""<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Movies</title>
 </head>
 <body>
   <header>
@@ -715,4 +715,18 @@ Document("""<!DOCTYPE html>
 
   <p>Dogs require regular exercise, nutrition, and medical care to stay healthy and happy. They also benefit from consistent training and socialization to develop good behavior and manners. Owners should be prepared to spend time and effort caring for their dogs, but the rewards of having a furry friend are well worth it.</p>
 </body>
+</html>""").insert()
+
+
+Document("""<html>
+  <head>
+    <title>My HTML Document</title>
+  </head>
+  <body>
+    <h1>Welcome to My HTML Document</h1>
+<img src="https://occ-0-37-784.1.nflxso.net/dnm/api/v6/LmEnxtiAuzezXBjYXPuDgfZ4zZQ/AAAABf2RRG1d4uOWahE6i116W6RxKsiflZ7n2lYYy24to_72YsTj6BkcdWKS1424kAevBrHW8r-v568YrHU3ZcQDWaPCsEODPJDdSkaYE9z6rf2n.png?r=4f1" alt="Girl in a jacket" >
+
+
+    <p>This is a small HTML document with a title, a header, and a paragraph of text.</p>
+  </body>
 </html>""").insert()
