@@ -89,24 +89,37 @@ def get_document(document_id):
 @requires_args('query')
 def search_documents():
     query = request.args.get('query')
-    
+    no_spell_check = request.args.get('no_spell_check', False)
+
+    if not no_spell_check:
+        spell_checker = SpellChecker()
+        query = ' '.join([spell_checker.correction(word) for word in query.split(' ')])
+
     results = engine.search(query)
     
     return jsonify({
         'success': True,
-        'results': [Document.query.get(result).format() for result in results]
+        'results': [Document.query.get(result).format() for result in results],
+        'query': query
     }), 200
     
 @app.route('/search/images', methods=['get'])
 @requires_args('query')
 def search_images():
     query = request.args.get('query')
+    no_spell_check = request.args.get('no_spell_check', False)
     
+    if not no_spell_check:
+        spell_checker = SpellChecker()
+        query = ' '.join([spell_checker.correction(word) for word in query.split(' ')])
+        
+        
     results = engine.search_images(query)
     
     return jsonify({
         'success': True,
-        'results': results
+        'results': results,
+        'query': query
     }), 200
     
 

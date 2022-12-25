@@ -13,6 +13,7 @@ https://github.com/benoitc/gunicorn/archive/ff58e0c6da83d5520916bc4cc109a529258d
 json5==0.9.5
 nltk==3.7
 psycopg2-binary==2.9.1
+pyspellchecker==0.7.1
 python-dateutil==2.8.1
 six==1.15.0
 SQLAlchemy==1.4.3
