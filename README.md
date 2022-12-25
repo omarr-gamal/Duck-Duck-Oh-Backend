@@ -1,6 +1,6 @@
 # Duck-Duck-Oh
 
-Welcome to Duck Duck Oh! This project is a simple search engine that allows you to add and search through a collection of documents.
+This project is a simple search engine that allows you to add and search through a collection of documents. It is running live on [Heroku](https://duck-duck-oh.herokuapp.com/).
 
 ## capabilities
 
@@ -23,6 +23,8 @@ This search engine supports the following features:
 - Add documents to the search engine via a POST request to the `/documents` endpoint. The request should include a `body` field in the JSON payload, which should contain the HTML body of the document.
 
 - Search for documents that contain a given search term by making a GET request to the `/search` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of documents that contain the search term, ranked by relevance.
+
+- Search for images by making a GET request to the `/search/images` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of images and the document that contains the image, ranked by relevance.
 
 - The search engine includes a spell checker that will automatically correct any misspellings in the search term. To disable this feature, include a `no_spell_check` parameter with a value of `true` in the query string of the `/search` endpoint.
 
