@@ -2,9 +2,9 @@
 
 This project is a simple search engine that allows you to add and search through a collection of documents. It is running live on [Heroku](https://duck-duck-oh.herokuapp.com/).
 
-## capabilities
+## Engine Capacity
 
-This search engine uses the following techniques to achieve its capabilities:
+This search engine uses the following techniques:
 
 - Tokenization: The search engine tokenizes the documents into words after removing any HTML tags and punctuation. It also removes any stop words, which are words that are commonly used in the English language but do not add any meaning to the document. For example, the words "the", "a", and "is" are stop words.
 
@@ -16,7 +16,7 @@ This search engine uses the following techniques to achieve its capabilities:
 
 - Stemming: The search engine uses the Porter stemmer algorithm to stem the words in the documents. This algorithm removes the suffixes from the words to get the root word. For example, the words "running", "ran", and "run" will all be stemmed to "run".
 
-## Features
+## Engine Features
 
 This search engine supports the following features:
 
