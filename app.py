@@ -91,12 +91,12 @@ def search_documents():
     results = engine.search(query)
     
     # Extract title and outline from each document
-    soup = BeautifulSoup(document.body, 'html.parser')
     
     formatted_results = []
     for result in results:
         document = Document.query.get(result)
 
+        soup = BeautifulSoup(document.body, 'html.parser')
         # Extract title
         title = soup.title.text if soup.title else ''
 
