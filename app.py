@@ -4,6 +4,7 @@
 
 from flask import (Flask, jsonify, request, abort)
 from flask_moment import Moment
+from flask_cors import CORS
 
 from models import *
 from engine import Engine
@@ -25,12 +26,24 @@ app.config.from_pyfile('config.py')
 
 db.init_app(app)
 
+CORS(app, resources={r"*/api/*": {"origins": "*"}})
+
 with app.app_context():
     engine = Engine()
 
 #----------------------------------------------------------------------------#
 # Routes.
 #----------------------------------------------------------------------------#
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers',
+                            'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                            'GET, POST, PATCH, DELETE, OPTIONS')
+    return response
+
 
 @app.route('/')
 def index():
