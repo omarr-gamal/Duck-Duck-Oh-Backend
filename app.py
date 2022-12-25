@@ -120,7 +120,7 @@ def search_documents():
     
     return jsonify({
         'success': True,
-        'results': [Document.query.get(result).format() for result in results],
+        'results': formatted_results,
         'query': query
     }), 200
     
