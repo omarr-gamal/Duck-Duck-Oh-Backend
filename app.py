@@ -44,18 +44,21 @@ def init():
 
     db.create_all(app=app)
     
-    Document('This is a document about cats.').insert()
-    Document('This is a document about dogs.').insert()
-    Document('This is a document about mcats and dogs.').insert()
-    Document('This is a document about catm and dogs.').insert()
-    Document('This is a document about mcat and dogs.').insert()
-    Document('This is a document about cats cats cats cat.').insert()
-    Document('This is a document about cat cat cat cat.').insert()
-    Document('This is a document about dog.').insert()
-    Document('This is a document about catsdogs.').insert()
-    Document('This is a document about elephants.').insert()
+    import init_db
     
-    engine.index_all_documents()
+    # Document('This is a document about cats.').insert()
+    # Document('This is a document about dogs.').insert()
+    # Document('This is a document about mcats and dogs.').insert()
+    # Document('This is a document about catm and dogs.').insert()
+    # Document('This is a document about mcat and dogs.').insert()
+    # Document('This is a document about cats cats cats cat.').insert()
+    # Document('This is a document about cat cat cat cat.').insert()
+    # Document('This is a document about dog.').insert()
+    # Document('This is a document about catsdogs.').insert()
+    # Document('This is a document about elephants.').insert()
+    
+    global engine
+    engine = Engine()
     
     return jsonify({
         'success': True
@@ -112,7 +115,6 @@ def search_images():
     if not no_spell_check:
         spell_checker = SpellChecker()
         query = ' '.join([spell_checker.correction(word) for word in query.split(' ')])
-        
         
     results = engine.search_images(query)
     

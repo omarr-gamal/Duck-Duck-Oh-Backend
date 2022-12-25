@@ -45,6 +45,15 @@ class Engine:
         index.update()
     
     def __tokenize(self, body):
+        # Remove HTML syntax
+        body = re.sub(r'<[^>]*>', '', body)
+        
+        # Remove special characters
+        body = re.sub(r'[^\w\s]', '', body)
+        
+        # Remove \n and \r
+        body = body.replace('\n', '').replace('\r', '')
+        
         # split body into tokens
         tokens = nltk.word_tokenize(body)
         
