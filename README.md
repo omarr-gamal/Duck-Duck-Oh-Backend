@@ -118,4 +118,4 @@ Note: The `query` field is the search term that was actually used to search the 
 
 ## License
 
-This project is licensed under the MIT License and is not affiliated with DuckDuckGo.
+This project is licensed under the MIT License.
