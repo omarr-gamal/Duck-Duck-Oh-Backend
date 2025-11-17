@@ -1,6 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
+import click
 
 from flask import (Flask, jsonify, request, abort)
 from flask_moment import Moment
@@ -44,6 +45,24 @@ def after_request(response):
     return response
 
 
+@app.cli.command("populate_db")
+def populate_db_cmd():
+    """Populate the database."""
+    
+    if not Document.query.first() and \
+        not Index.query.first():
+        
+        import init_db
+        click.echo("Database populated.")
+        
+@app.cli.command("reset_db")
+def reset_db_cmd():
+    """Reset the database."""
+    db.drop_all()
+    db.create_all()   
+
+    click.echo("Database reset.")
+
 @app.route('/')
 def index():
     return jsonify({
@@ -66,7 +85,6 @@ def init():
         'success': True
     }), 200
     
-
 @app.route('/documents', methods=['POST'])
 @requires_body('body')
 def create_document():
