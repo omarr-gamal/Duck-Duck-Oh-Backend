@@ -8,7 +8,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 
 from models import *
-from engine import Engine
+from engine import engine
 
 from request_errors import requires_body, requires_args
 
@@ -29,9 +29,6 @@ db.init_app(app)
 migrate.init_app(app, db)
 
 CORS(app, resources={r"*/api/*": {"origins": "*"}})
-
-with app.app_context():
-    engine = Engine()
 
 #----------------------------------------------------------------------------#
 # Routes.

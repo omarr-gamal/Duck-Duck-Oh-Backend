@@ -17,6 +17,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 class Engine:
     def __init__(self):
+        self.__is_initialized = False
+     
+    def __initialize(self):
+        if self.__is_initialized:
+            return
+        
         self.stop_words = list(nltk.corpus.stopwords.words('english'))
         self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)
         
@@ -33,8 +39,12 @@ class Engine:
         self.index = json.loads(ind.index)
             
         self.vectorizer.fit(self.documents)
+
+        self.__is_initialized = True
         
     def index_all_documents(self):
+        self.__initialize()
+
         for document in Document.query.all():
             tokens = self.__tokenize(document.body)
             self.__add_to_index(document.id, tokens)
@@ -80,6 +90,8 @@ class Engine:
         self.__update_index()
     
     def add_document(self, body):
+        self.__initialize()
+
         document = Document(body)
         document.insert()
     
@@ -128,6 +140,8 @@ class Engine:
     
     # return a list of document ids that are ranked based on relevance to search_term
     def search(self, search_term):
+        self.__initialize()
+
         # search index
         documents = self.__search_index(search_term)
         
@@ -137,6 +151,8 @@ class Engine:
         return ranked_documents
 
     def search_images(self, search_term):
+        self.__initialize()
+
         # Get matching documents
         matching_documents = self.__search_index(search_term)
         
@@ -157,3 +173,6 @@ class Engine:
                 })
 
         return image_urls
+
+engine = Engine()
+
