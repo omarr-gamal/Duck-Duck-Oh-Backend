@@ -5,6 +5,7 @@
 from flask import (Flask, jsonify, request, abort)
 from flask_moment import Moment
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 from models import *
 from engine import Engine
@@ -25,6 +26,7 @@ moment = Moment(app)
 app.config.from_pyfile('config.py')
 
 db.init_app(app)
+migrate.init_app(app, db)
 
 CORS(app, resources={r"*/api/*": {"origins": "*"}})
 
