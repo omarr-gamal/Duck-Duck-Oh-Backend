@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 import nltk
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 
 from models import Index, Document
@@ -16,7 +17,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 class Engine:
     def __init__(self):
-        self.stop_words = set(nltk.corpus.stopwords.words('english'))
+        self.stop_words = list(nltk.corpus.stopwords.words('english'))
         self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)
         
         self.index = {}
