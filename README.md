@@ -135,4 +135,5 @@ Note: The `query` field is the search term that was actually used to search the 
 
 ## License
 
-This project is licensed under the MIT License.
+MIT, do as you please.
+
