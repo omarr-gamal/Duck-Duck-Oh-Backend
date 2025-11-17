@@ -36,13 +36,30 @@ To set up the search engine, follow these steps:
 
 1. Clone the repository and navigate to the project directory.
 
-2. Set up a virtual environment and install the required packages by running `pip install -r requirements.txt`.
+2. Configure environment variables:
 
-3. Create a PostgreSQL database and update the `DATABASE_URI` field in the `config.py` file with the database connection string.
+You mainly need to set database url and credentials. You provide a connection string as a whole or set the fields individually. The [.env.example](.env.example) file contains documentation for the environment variables used by the app.
 
-4. Run the database migration and initialization scripts by making a POST request to the `/init` endpoint. This will create the required tables in the database and add a few example documents to the search engine.
+```bash
+cp .env.example .env 
+vi .env # set db connection string.
+```
 
-5. Run the app by executing `flask run`. The search engine will be available at <http://localhost:5000>.
+3. Build a Docker image:
+
+```bash
+docker build -t duck-duck-oh-backend .
+```
+
+4. Run the app as a container:
+
+The api listens on port `5000` 
+
+```bash
+docker run -d -p 5000:5000 duck-duck-oh-backend
+```
+
+5. Access the search engine  at <http://localhost:5000>.
 
 ## Endpoints
 
