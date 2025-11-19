@@ -5,9 +5,6 @@ import json
 from bs4 import BeautifulSoup
 
 import nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('stopwords')
 
 from models import Index, Document
 
@@ -19,9 +16,16 @@ class Engine:
     def __init__(self):
         self.__is_initialized = False
      
+    def download_nltk_dicts(self):
+        nltk.download('punkt')
+        nltk.download('punkt_tab')
+        nltk.download('stopwords')
+
     def __initialize(self):
         if self.__is_initialized:
             return
+
+        self.download_nltk_dicts()
         
         self.stop_words = list(nltk.corpus.stopwords.words('english'))
         self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)

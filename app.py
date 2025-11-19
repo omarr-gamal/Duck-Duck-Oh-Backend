@@ -47,6 +47,13 @@ def after_request(response):
     return response
 
 
+@app.cli.command("download_nltk")
+def download_nltk():
+    """Download NLTK dictionaries"""
+
+    engine.download_nltk_dicts()
+    click.echo("NLTK dictionaries downloaded.")
+
 @app.cli.command("populate_db")
 def populate_db_cmd():
     """Populate the database."""
