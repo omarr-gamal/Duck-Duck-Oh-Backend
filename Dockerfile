@@ -8,6 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod a+x startup.sh
 
+RUN flask download_nltk
+
 EXPOSE 5000
 
 ENTRYPOINT ["./startup.sh"]
