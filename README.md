@@ -1,6 +1,6 @@
 # Duck-Duck-Oh
 
-This project is a simple search engine that allows you to add and search through a collection of documents. It is running live on [Heroku](https://duck-duck-oh.herokuapp.com/).
+This project is a simple search engine API that allows you to add and search through a collection of documents. Check out a frontend React app that integrates with this API at [Omar-Gebal/react-simple-search-engine](https://github.com/Omar-Gebal/react-simple-search-engine/).
 
 ## Engine Capacity
 
