@@ -148,14 +148,7 @@ def get_document(document_id):
     if not document:
         abort(404, "Document not found")
 
-    return {
-        "success": True,
-        "document": {
-            "id": document.id,
-            "body": document.body,
-            "added_at": document.added_at,
-        },
-    }
+    return {"success": True, "document": document}
 
 
 @app.route("/search", methods=["GET"])

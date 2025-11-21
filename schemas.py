@@ -2,6 +2,7 @@
 Marshmallow schemas for request/response serialization and validation
 """
 
+from ast import dump
 from flask_marshmallow import Marshmallow
 from marshmallow import fields, validate, EXCLUDE
 
@@ -33,7 +34,9 @@ class DocumentBodySchema(ma.Schema):
 class DocumentSchema(ma.Schema):
     """Schema for document response"""
 
-    id = fields.Int(required=True)
+    id = fields.Int(dump_only=True, required=True)
+    title = fields.Str(dump_only=True, required=True, allow_none=True)
+    outline = fields.Str(dump_only=True, required=True, allow_none=True)
     body = fields.Str(required=True)
     added_at = fields.DateTime(required=True)
 
@@ -60,21 +63,11 @@ class SearchQuerySchema(ma.Schema):
         unknown = EXCLUDE
 
 
-class SearchResultSchema(ma.Schema):
-    """Schema for individual search result"""
-
-    id = fields.Int(dump_only=True, required=True)
-    title = fields.Str(dump_only=True, required=True, allow_none=True)
-    body = fields.Str(dump_only=True, required=True)
-    added_at = fields.DateTime(dump_only=True, required=True)
-    outline = fields.Str(dump_only=True, required=True, allow_none=True)
-
-
 class SearchResponseSchema(ma.Schema):
     """Schema for search results response"""
 
     success = fields.Bool(required=True)
-    results = fields.List(fields.Nested(SearchResultSchema), required=True)
+    results = fields.List(fields.Nested(DocumentSchema), required=True)
     query = fields.Str(required=True)
 
 
