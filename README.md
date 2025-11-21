@@ -6,27 +6,27 @@ This project is a simple search engine API that allows you to add and search thr
 
 This search engine uses the following techniques:
 
-- Tokenization: The search engine tokenizes the documents into words after removing any HTML tags and punctuation. It also removes any stop words, which are words that are commonly used in the English language but do not add any meaning to the document. For example, the words "the", "a", and "is" are stop words.
+- **Tokenization:** The search engine tokenizes the documents into words after removing any HTML tags and punctuation. It also removes any stop words, which are words that are commonly used in the English language but do not add any meaning to the document. For example, the words "the", "a", and "is" are stop words.
 
-- TF-IDF Vectorization: The search engine uses the TF-IDF vectorization technique to rank the documents by relevance. The TF-IDF algorithm takes into account the frequency of a word in a document and the number of documents that contain the word. The more frequently a word appears in a document, the more important it is. The more documents that contain the word, the less important it is.
+- **TF-IDF Vectorization:** The search engine uses the TF-IDF vectorization technique to rank the documents by relevance. The TF-IDF algorithm takes into account the frequency of a word in a document and the number of documents that contain the word. The more frequently a word appears in a document, the more important it is. The more documents that contain the word, the less important it is.
 
-- Ranking: The search engine ranks the results by calculating the cosine similarity between the search term and the documents. To do this, it first converts the search term and the document bodies into numerical vectors using the TF-IDF vectorizer. The vectorizer converts the search term and document bodies into a sparse matrix, where each row represents a document and each column represents a word. Each cell in the matrix represents the importance of a word in a document, based on the frequency of the word in the document and the rarity of the word in the entire collection of documents. Next, the search engine calculates the cosine similarity between the search vector and each document vector. The cosine similarity is a measure of similarity between two non-zero vectors of an inner product space that measures the cosine of the angle between them.
+- **Ranking:** The search engine ranks the results by calculating the cosine similarity between the search term and the documents. To do this, it first converts the search term and the document bodies into numerical vectors using the TF-IDF vectorizer. The vectorizer converts the search term and document bodies into a sparse matrix, where each row represents a document and each column represents a word. Each cell in the matrix represents the importance of a word in a document, based on the frequency of the word in the document and the rarity of the word in the entire collection of documents. Next, the search engine calculates the cosine similarity between the search vector and each document vector. The cosine similarity is a measure of similarity between two non-zero vectors of an inner product space that measures the cosine of the angle between them.
 
-- Spell Checking: The search engine spell checks the search queries by using the Levenshtein distance algorithm which calculates the number of edits required to transform one word into another and suggest the most likely word that the user meant to search for.
+- **Spell Checking:** The search engine spell checks the search queries by using the Levenshtein distance algorithm which calculates the number of edits required to transform one word into another and suggest the most likely word that the user meant to search for.
 
-- Stemming: The search engine uses the Porter stemmer algorithm to stem the words in the documents. This algorithm removes the suffixes from the words to get the root word. For example, the words "running", "ran", and "run" will all be stemmed to "run".
+- **Stemming:** The search engine uses the Porter stemmer algorithm to stem the words in the documents. This algorithm removes the suffixes from the words to get the root word. For example, the words "running", "ran", and "run" will all be stemmed to "run".
 
 ## Engine Features
 
 This search engine supports the following features:
 
-- Add documents to the search engine via a POST request to the `/documents` endpoint. The request should include a `body` field in the JSON payload, which should contain the HTML body of the document.
+- **Add documents** to the search engine via a POST request to the `/documents` endpoint. The request should include a `body` field in the JSON payload, which should contain the HTML body of the document.
 
-- Search for documents that contain a given search term by making a GET request to the `/search` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of documents that contain the search term, ranked by relevance.
+- **Search for documents** that contain a given search term by making a GET request to the `/search` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of documents that contain the search term, ranked by relevance.
 
-- Search for images by making a GET request to the `/search/images` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of images and the document that contains the image, ranked by relevance.
+- **Search for images** by making a GET request to the `/search/images` endpoint. This endpoint requires a `query` parameter in the query string, which should contain the search term. The search engine will return a list of images and the document that contains the image, ranked by relevance.
 
-- The search engine includes a spell checker that will automatically correct any misspellings in the search term. To disable this feature, include a `no_spell_check` parameter with a value of `true` in the query string of the `/search` endpoint.
+- The search engine includes a **spell checker** that will automatically correct any misspellings in the search term. To disable this feature, include a `no_spell_check` parameter with a value of `true` in the query string of the `/search` endpoint.
 
 - The search engine returns a results of a list of objects, or documents, containing the following fields: `id`, `title`, `body`, `added_at`, and `outline`.
 
