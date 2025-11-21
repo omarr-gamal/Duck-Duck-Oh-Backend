@@ -3,7 +3,7 @@ Marshmallow schemas for request/response serialization and validation
 """
 
 from flask_marshmallow import Marshmallow
-from marshmallow import Schema, fields, validate, EXCLUDE
+from marshmallow import fields, validate, EXCLUDE
 
 # ma initialized in app.py
 ma = Marshmallow()
@@ -12,13 +12,13 @@ ma = Marshmallow()
 class HealthCheckSchema(ma.Schema):
     """Health check response schema"""
 
-    search_engine = fields.Bool(required=True)
+    search_engine = fields.Bool(dump_only=True, required=True)
 
 
 class SuccessSchema(ma.Schema):
     """Generic success response schema"""
 
-    success = fields.Bool(required=True)
+    success = fields.Bool(dump_only=True, required=True)
 
 
 class DocumentBodySchema(ma.Schema):
@@ -41,8 +41,8 @@ class DocumentSchema(ma.Schema):
 class DocumentResponseSchema(ma.Schema):
     """Schema for single document response"""
 
-    success = fields.Bool(required=True)
-    document = fields.Nested(DocumentSchema, required=True)
+    success = fields.Bool(dump_only=True, required=True)
+    document = fields.Nested(DocumentSchema, dump_only=True, required=True)
 
 
 class SearchQuerySchema(ma.Schema):
@@ -63,11 +63,11 @@ class SearchQuerySchema(ma.Schema):
 class SearchResultSchema(ma.Schema):
     """Schema for individual search result"""
 
-    id = fields.Int(required=True)
-    title = fields.Str(required=True, allow_none=True)
-    body = fields.Str(required=True)
-    added_at = fields.DateTime(required=True)
-    outline = fields.Str(required=True, allow_none=True)
+    id = fields.Int(dump_only=True, required=True)
+    title = fields.Str(dump_only=True, required=True, allow_none=True)
+    body = fields.Str(dump_only=True, required=True)
+    added_at = fields.DateTime(dump_only=True, required=True)
+    outline = fields.Str(dump_only=True, required=True, allow_none=True)
 
 
 class SearchResponseSchema(ma.Schema):
@@ -82,22 +82,24 @@ class ImageSearchResultSchema(ma.Schema):
     """Schema for image search result"""
 
     # Adjust these fields based on what engine.search_images() returns
-    url = fields.Str(required=True)
-    title = fields.Str(allow_none=True)
-    thumbnail = fields.Str(allow_none=True)
+    url = fields.Str(dump_only=True, required=True)
+    title = fields.Str(dump_only=True, allow_none=True)
+    thumbnail = fields.Str(dump_only=True, allow_none=True)
 
 
 class ImageSearchResponseSchema(ma.Schema):
     """Schema for image search results response"""
 
-    success = fields.Bool(required=True)
-    results = fields.List(fields.Nested(ImageSearchResultSchema), required=True)
-    query = fields.Str(required=True)
+    success = fields.Bool(dump_only=True, required=True)
+    results = fields.List(
+        fields.Nested(ImageSearchResultSchema), dump_only=True, required=True
+    )
+    query = fields.Str(dump_only=True, required=True)
 
 
 class ErrorSchema(ma.Schema):
     """Schema for error responses"""
 
-    success = fields.Bool(required=True)
-    error = fields.Int(required=True)
-    message = fields.Str(required=True)
+    success = fields.Bool(dump_only=True, dump_default=False, required=True)
+    error = fields.Int(dump_only=True, required=True)
+    message = fields.Str(dump_only=True, required=True)
