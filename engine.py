@@ -15,74 +15,74 @@ from sklearn.metrics.pairwise import cosine_similarity
 class Engine:
     def __init__(self):
         self.__is_initialized = False
-     
+
     def download_nltk_dicts(self):
-        nltk.download('punkt')
-        nltk.download('punkt_tab')
-        nltk.download('stopwords')
+        nltk.download("punkt")
+        nltk.download("punkt_tab")
+        nltk.download("stopwords")
 
     def __initialize(self):
         if self.__is_initialized:
             return
 
         self.download_nltk_dicts()
-        
-        self.stop_words = list(nltk.corpus.stopwords.words('english'))
+
+        self.stop_words = list(nltk.corpus.stopwords.words("english"))
         self.vectorizer = TfidfVectorizer(stop_words=self.stop_words)
-        
+
         self.index = {}
         self.documents = [document.body for document in Document.query.all()]
-        
+
         ind = Index.query.first()
         if not ind:
-            ind = Index('{}')
+            ind = Index("{}")
             ind.insert()
-            
+
             self.index_all_documents()
-    
+
         self.index = json.loads(ind.index)
-            
+
         self.vectorizer.fit(self.documents)
 
         self.__is_initialized = True
-        
+
     def index_all_documents(self):
         self.__initialize()
 
         for document in Document.query.all():
             tokens = self.__tokenize(document.body)
             self.__add_to_index(document.id, tokens)
-    
+
     def __update_index(self):
         index_json = json.dumps(self.index)
-        
+
         index = Index.query.first()
         index.index = index_json
-        
+
         index.update()
-    
+
     def __tokenize(self, body):
         # Remove HTML syntax
-        body = re.sub(r'<[^>]*>', '', body)
-        
+        body = re.sub(r"<[^>]*>", "", body)
+
         # Remove special characters
-        body = re.sub(r'[^\w\s]', '', body)
-        
+        body = re.sub(r"[^\w\s]", "", body)
+
         # Remove \n and \r
-        body = body.replace('\n', '').replace('\r', '')
-        
+        body = body.replace("\n", "").replace("\r", "")
+
         # split body into tokens
         tokens = nltk.word_tokenize(body)
-        
+
         # remove stop words
         tokens = [token for token in tokens if token not in self.stop_words]
-        
+
         # stem tokens
         stemmer = nltk.stem.PorterStemmer()
         tokens = [stemmer.stem(token) for token in tokens]
-        
+
         return tokens
-    
+
     def __add_to_index(self, document_id, tokens):
         # add document to index
         for token in tokens:
@@ -90,38 +90,40 @@ class Engine:
                 self.index[token].append(document_id)
             else:
                 self.index[token] = [document_id]
-                
+
         self.__update_index()
-    
+
     def add_document(self, body):
         self.__initialize()
 
         document = Document(body)
         document.insert()
-    
+
         # add document to list of documents
         self.documents.append(body)
-    
+
         # tokenize and add to index
         tokens = self.__tokenize(body)
         self.__add_to_index(document.id, tokens)
-    
+
         self.vectorizer.fit(self.documents)
-           
+
+        return document
+
     def __search_index(self, search_term):
         search_tokens = self.__tokenize(search_term)
-        
+
         # get documents that match search tokens
         matching_documents = []
         for token in search_tokens:
             if token in self.index:
                 matching_documents += self.index[token]
-        
+
         # remove duplicates
         matching_documents = list(set(matching_documents))
-        
+
         return matching_documents
-    
+
     def __rank_results(self, documents, search_term):
         # Check if documents list is empty or search_term is empty
         if not len(documents) or not search_term:
@@ -135,23 +137,29 @@ class Engine:
         document_vectors = self.vectorizer.transform(bodies)
 
         # Calculate cosine similarity between search vector and document vectors
-        similarities = [cosine_similarity(search_vector, document_vector)[0][0] for document_vector in document_vectors]
+        similarities = [
+            cosine_similarity(search_vector, document_vector)[0][0]
+            for document_vector in document_vectors
+        ]
 
         # Rank documents by similarity
-        ranked_documents = [document for _, document in sorted(zip(similarities, documents), reverse=True)]
+        ranked_documents = [
+            document
+            for _, document in sorted(zip(similarities, documents), reverse=True)
+        ]
 
         return ranked_documents
-    
+
     # return a list of document ids that are ranked based on relevance to search_term
     def search(self, search_term):
         self.__initialize()
 
         # search index
         documents = self.__search_index(search_term)
-        
+
         # rank documents by relevance
         ranked_documents = self.__rank_results(documents, search_term)
-        
+
         return ranked_documents
 
     def search_images(self, search_term):
@@ -159,7 +167,7 @@ class Engine:
 
         # Get matching documents
         matching_documents = self.__search_index(search_term)
-        
+
         # rank documents by relevance
         ranked_documents = self.__rank_results(matching_documents, search_term)
 
@@ -167,16 +175,13 @@ class Engine:
         image_urls = []
         for document_id in ranked_documents:
             document = Document.query.get(document_id)
-            
+
             # parse HTML and extract image URLs
-            soup = BeautifulSoup(document.body, 'html.parser')
-            for img in soup.find_all('img'):
-                image_urls.append({
-                    'url': img['src'],
-                    'document_id': document.id
-                })
+            soup = BeautifulSoup(document.body, "html.parser")
+            for img in soup.find_all("img"):
+                image_urls.append({"url": img["src"], "document_id": document.id})
 
         return image_urls
 
-engine = Engine()
 
+engine = Engine()
