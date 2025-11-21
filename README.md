@@ -61,6 +61,10 @@ docker run -d -p 5000:5000 duck-duck-oh-backend
 
 5. Access the search engine  at <http://localhost:5000>.
 
+6. Access API documentation at <http://localhost:5000/docs> to view and interact with the API endpoints. Here's a preview of the documentation:
+  <img width="1920" height="950" alt="Screenshot 2025-11-21 at 20-37-07 Duck Duck Oh API 1 0" src="https://github.com/user-attachments/assets/52172304-29af-4808-bd35-106f18c0c786" />
+ 
+
 ## Endpoints
 
 ### POST /documents
