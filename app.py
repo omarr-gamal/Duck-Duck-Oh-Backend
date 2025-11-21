@@ -9,7 +9,7 @@ Cosine Similarity to rank the documents by relevance to search query.
 # ----------------------------------------------------------------------------#
 import click
 
-from flask import Flask, abort, request
+from flask import Flask, jsonify, abort, request
 from flask_moment import Moment
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -98,27 +98,6 @@ def index():
     Check if the search engine API is running
     """
     return {"search_engine": True}
-
-
-@app.route("/init")
-@response(SuccessSchema)
-@other_responses({500: ErrorSchema})
-def init():
-    """Initialize database
-
-    Drop and recreate the database schema, then populate with initial data
-    """
-    db.engine.execute("DROP SCHEMA public CASCADE;")
-    db.engine.execute("CREATE SCHEMA public;")
-
-    db.create_all(app=app)
-
-    import init_db
-
-    global engine
-    engine = Engine()
-
-    return {"success": True}
 
 
 @app.route("/documents", methods=["POST"])
