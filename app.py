@@ -123,7 +123,7 @@ def init():
 
 @app.route("/documents", methods=["POST"])
 @body(DocumentBodySchema)
-@response(SuccessSchema, 200)
+@response(DocumentResponseSchema, 200)
 @other_responses({400: ErrorSchema, 500: ErrorSchema})
 def create_document(body_data):
     """Create a new document
@@ -131,8 +131,9 @@ def create_document(body_data):
     Add a new HTML document to the search engine index
     """
     body = body_data["body"]
-    engine.add_document(body)
-    return {"success": True}
+    document = engine.add_document(body)
+
+    return {"success": True, "document": document}
 
 
 @app.route("/documents/<int:document_id>", methods=["GET"])
