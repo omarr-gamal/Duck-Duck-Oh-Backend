@@ -30,8 +30,6 @@ from schemas import (
 )
 
 from spellchecker import SpellChecker
-from bs4 import BeautifulSoup
-
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -176,39 +174,9 @@ def search_documents(query_params):
         spell_checker = SpellChecker()
         query = " ".join([spell_checker.correction(word) for word in query.split(" ")])
 
-    results = engine.search(query)
+    results = [Document.query.get(doc_id) for doc_id in engine.search(query)]
 
-    # Extract title and outline from each document
-    formatted_results = []
-    for result in results:
-        document = Document.query.get(result)
-
-        soup = BeautifulSoup(document.body, "html.parser")
-
-        # Extract title
-        title = soup.title.text if soup.title else ""
-
-        # Extract outline
-        outline = ""
-        p_tags = soup.find_all("p")
-        if p_tags:
-            outline = p_tags[0].text
-        else:
-            div_tags = soup.find_all("div")
-            if div_tags:
-                outline = div_tags[0].text
-
-        formatted_results.append(
-            {
-                "id": document.id,
-                "title": title,
-                "body": document.body,
-                "added_at": document.added_at,
-                "outline": outline,
-            }
-        )
-
-    return {"success": True, "results": formatted_results, "query": query}
+    return {"success": True, "results": results, "query": query}
 
 
 @app.route("/search/images", methods=["GET"])
