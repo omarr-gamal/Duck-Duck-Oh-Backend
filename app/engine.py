@@ -34,18 +34,25 @@ class Engine:
         self.index = {}
         self.documents = [document.body for document in Document.query.all()]
 
-        ind = Index.query.first()
-        if not ind:
-            ind = Index("{}")
-            ind.insert()
-
-            self.index_all_documents()
-
-        self.index = json.loads(ind.index)
-
-        self.vectorizer.fit(self.documents)
-
+        # Set initialized to True early to prevent recursion when calling index_all_documents
         self.__is_initialized = True
+
+        ind = Index.query.first()
+        try:
+            if ind and ind.index:
+                self.index = json.loads(ind.index)
+            else:
+                raise ValueError("Empty index")
+        except (json.JSONDecodeError, ValueError):
+            self.index = {}
+            if not ind:
+                ind = Index("{}")
+                ind.insert()
+            
+            self.index_all_documents()
+        
+        if self.documents:
+            self.vectorizer.fit(self.documents)
 
     def index_all_documents(self):
         self.__initialize()
@@ -116,7 +123,16 @@ class Engine:
         if not len(documents) or not search_term:
             return []
 
-        bodies = [db.session.get(Document, document_id).body for document_id in documents]
+        bodies = []
+        valid_documents = []
+        for document_id in documents:
+            doc = db.session.get(Document, document_id)
+            if doc:
+                bodies.append(doc.body)
+                valid_documents.append(document_id)
+        
+        if not bodies:
+            return []
 
         search_vector = self.vectorizer.transform([search_term])
         document_vectors = self.vectorizer.transform(bodies)
@@ -127,7 +143,7 @@ class Engine:
         ]
         ranked_documents = [
             document
-            for _, document in sorted(zip(similarities, documents), reverse=True)
+            for _, document in sorted(zip(similarities, valid_documents), reverse=True)
         ]
 
         return ranked_documents

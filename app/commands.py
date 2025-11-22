@@ -18,6 +18,8 @@ def populate_db_cmd():
     """Populate the database."""
     if not Document.query.first() and not Index.query.first():
         import init_db
+        engine.index_all_documents()
+
         click.echo("Database populated.")
 
 

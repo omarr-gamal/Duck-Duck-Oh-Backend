@@ -95,3 +95,18 @@ class ErrorSchema(ma.Schema):
     success = fields.Bool(dump_only=True, dump_default=False, required=True)
     error = fields.Int(dump_only=True, required=True)
     message = fields.Str(dump_only=True, required=True)
+
+
+class ApiKeySchema(ma.Schema):
+    """Schema for API key"""
+
+    key = fields.Str(dump_only=True, required=True)
+    description = fields.Str(required=False, allow_none=True)
+    created_at = fields.DateTime(dump_only=True, required=True)
+
+
+class ApiKeyResponseSchema(ma.Schema):
+    """Schema for API key response"""
+
+    success = fields.Bool(dump_only=True, required=True)
+    api_key = fields.Nested(ApiKeySchema, dump_only=True, required=True)

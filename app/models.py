@@ -74,3 +74,16 @@ class Index(BaseDbModel, db.Model):
 
     def __init__(self, index):
         self.index = index
+
+
+class ApiKey(BaseDbModel, db.Model):
+    __tablename__ = "ApiKey"
+
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String, unique=True, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    description = db.Column(db.String)
+
+    def __init__(self, key, description=None):
+        self.key = key
+        self.description = description

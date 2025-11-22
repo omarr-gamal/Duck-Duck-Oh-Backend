@@ -11,6 +11,10 @@ APIFAIRY_TITLE = "Duck Duck Oh API"
 APIFAIRY_VERSION = "1.0"
 APIFAIRY_UI = "elements"
 
+# Rate Limiting
+RATELIMIT_GUEST = "10 per minute"
+RATELIMIT_AUTHENTICATED = "20 per minute"
+
 # fall back to SQLite in-memory db if no database url is provided
 SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
 SQLALCHEMY_TRACK_MODIFICATIONS = False

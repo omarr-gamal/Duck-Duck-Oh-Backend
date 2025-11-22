@@ -34,9 +34,18 @@ def session(db):
     session.remove()
 
 @pytest.fixture(scope='module')
-def client(app):
+def client(app, db):
     return app.test_client()
 
 @pytest.fixture(scope='module')
 def runner(app):
     return app.test_cli_runner()
+
+@pytest.fixture(autouse=True)
+def disable_rate_limit_by_default(app):
+    """Disable rate limiting by default for all tests"""
+    from app.extensions import limiter
+    original = limiter.enabled
+    limiter.enabled = False
+    yield
+    limiter.enabled = original

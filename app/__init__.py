@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from .extensions import db, migrate, ma, apifairy, moment
+from .extensions import db, migrate, ma, apifairy, moment, limiter
 from .main import main as main_blueprint
 from .commands import download_nltk, populate_db_cmd, reset_db_cmd
 
@@ -14,6 +14,7 @@ def create_app(config_file="config.py"):
     ma.init_app(app)
     apifairy.init_app(app)
     moment.init_app(app)
+    limiter.init_app(app)
     
     CORS(app, resources={r"*/api/*": {"origins": "*"}})
     
