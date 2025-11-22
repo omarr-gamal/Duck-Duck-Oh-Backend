@@ -12,6 +12,7 @@ cryptography==46.0.3
 dnspython==2.8.0
 eventlet==0.40.3
 Flask==3.1.2
+faker==33.0.0
 flask-cors==6.0.1
 Flask-HTTPAuth==4.8.0
 flask-marshmallow==1.3.0
@@ -35,6 +36,9 @@ packaging==25.0
 psycopg2-binary==2.9.11
 pycparser==2.23
 pyspellchecker==0.8.3
+pytest==8.3.3
+pytest-flask==1.3.0
+pytest-cov==6.0.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 regex==2025.11.3
