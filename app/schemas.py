@@ -6,8 +6,7 @@ from ast import dump
 from flask_marshmallow import Marshmallow
 from marshmallow import fields, validate, EXCLUDE
 
-# ma initialized in app.py
-ma = Marshmallow()
+from .extensions import ma
 
 
 class HealthCheckSchema(ma.Schema):
