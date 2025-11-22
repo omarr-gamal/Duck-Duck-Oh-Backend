@@ -7,7 +7,7 @@ from .commands import download_nltk, populate_db_cmd, reset_db_cmd
 def create_app(config_file="config.py"):
     app = Flask(__name__)
     
-    app.config.from_pyfile(f"../{config_file}")
+    app.config.from_pyfile(config_file)
     
     db.init_app(app)
     migrate.init_app(app, db)
