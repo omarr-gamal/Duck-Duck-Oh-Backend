@@ -30,6 +30,27 @@ This search engine supports the following features:
 
 - The search engine returns a results of a list of objects, or documents, containing the following fields: `id`, `title`, `body`, `added_at`, and `outline`.
 
+## Rate Limiting & Authentication
+
+The API implements rate limiting:
+
+- **Unauthenticated Requests:** Limited to **10 requests per minute**.
+- **Authenticated Requests:** Limited to **20 requests per minute**.
+
+You can generate an API key and include it in your requests using the `X-API-KEY` header.
+
+### Generating an API Key
+
+Send a POST request to `/api/keys` with an optional description.
+
+### Using an API Key
+
+Include the key in the `X-API-KEY` header:
+
+```bash
+curl -H "X-API-KEY: your_api_key_here" http://localhost:5000/search?query=example
+```
+
 ## Setup
 
 To set up the search engine, follow these steps:
@@ -39,6 +60,10 @@ To set up the search engine, follow these steps:
 2. Configure environment variables:
 
 You mainly need to set database url and credentials. You provide a connection string as a whole or set the fields individually. The [.env.example](.env.example) file contains documentation for the environment variables used by the app.
+
+You can also configure rate limits using the following environment variables:
+- `RATELIMIT_GUEST`: Rate limit for unauthenticated requests (default: "10 per minute")
+- `RATELIMIT_AUTHENTICATED`: Rate limit for authenticated requests (default: "20 per minute")
 
 ```bash
 cp .env.example .env 
@@ -158,6 +183,30 @@ This route is used to search the documents in the database. It takes in a single
         }
     ],
     "query": "example"
+}
+```
+
+### POST /api/keys
+
+Generates a new API key.
+
+#### Request
+
+```json
+{
+  "description": "My App Key"
+}
+```
+
+#### Response
+
+```json
+{
+  "api_key": {
+    "key": "generated_secret_key",
+    "description": "My App Key",
+    "created_at": "2025-11-22T20:00:00"
+  }
 }
 ```
 

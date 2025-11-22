@@ -30,8 +30,8 @@ else:
         f"postgresql://{db_user}:{db_pass}@{db_base_url}/{db_name}"
     )
 
-RATELIMIT_GUEST = "10 per minute"
-RATELIMIT_AUTHENTICATED = "20 per minute"
+RATELIMIT_GUEST = os.environ.get("RATELIMIT_GUEST", "10 per minute")
+RATELIMIT_AUTHENTICATED = os.environ.get("RATELIMIT_AUTHENTICATED", "20 per minute")
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 RATELIMIT_STORAGE_URI = "memory://"
