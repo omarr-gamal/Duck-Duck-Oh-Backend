@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from bs4 import BeautifulSoup
 
@@ -39,7 +39,7 @@ class Document(BaseDbModel, db.Model):
     outline = db.Column(db.String)
     body = db.Column(db.String)
 
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
+    added_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __init__(self, body):
         self.body = body

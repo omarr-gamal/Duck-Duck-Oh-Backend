@@ -3,6 +3,7 @@ from apifairy import response, body, arguments, other_responses
 from spellchecker import SpellChecker
 
 from ..models import Document
+from ..extensions import db
 from ..engine import engine
 from ..schemas import (
     HealthCheckSchema,
@@ -62,7 +63,7 @@ def get_document(document_id):
 
     Retrieve a specific document from the database
     """
-    document = Document.query.get(document_id)
+    document = db.session.get(Document, document_id)
 
     if not document:
         abort(404, "Document not found")
@@ -86,7 +87,7 @@ def search_documents(query_params):
         spell_checker = SpellChecker()
         query = " ".join([spell_checker.correction(word) for word in query.split(" ")])
 
-    results = [Document.query.get(doc_id) for doc_id in engine.search(query)]
+    results = [db.session.get(Document, doc_id) for doc_id in engine.search(query)]
 
     return {"success": True, "results": results, "query": query}
 

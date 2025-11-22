@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import nltk
 
 from .models import Index, Document
+from .extensions import db
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -115,7 +116,7 @@ class Engine:
         if not len(documents) or not search_term:
             return []
 
-        bodies = [Document.query.get(document_id).body for document_id in documents]
+        bodies = [db.session.get(Document, document_id).body for document_id in documents]
 
         search_vector = self.vectorizer.transform([search_term])
         document_vectors = self.vectorizer.transform(bodies)
@@ -147,7 +148,7 @@ class Engine:
 
         image_urls = []
         for document_id in ranked_documents:
-            document = Document.query.get(document_id)
+            document = db.session.get(Document, document_id)
             soup = BeautifulSoup(document.body, "html.parser")
             for img in soup.find_all("img"):
                 image_urls.append({"url": img["src"], "document_id": document.id})
